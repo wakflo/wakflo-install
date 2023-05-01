@@ -58,7 +58,7 @@ choco install wakflo
 
 
 ```sh
-cargo install wakflo-cli
+cargo install wakflo
 ```
 
 ## Environment Variables
