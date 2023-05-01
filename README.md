@@ -1,6 +1,6 @@
 # wakflo-install
 
-**One-line commands to install Wasmer on your system.**
+**One-line commands to install Wakflo on your system.**
 
 [![Build Status](https://github.com/wakflo/wakflo-install/workflows/ci/badge.svg?branch=main)](https://github.com/wakflo/wakflo-install/actions)
 
@@ -48,7 +48,7 @@ scoop install wakflo
 
 **With [Chocolatey](https://chocolatey.org/packages/wakflo):**
 
-**Wasmer is not yet available in Chocolatey, would you like to give us a hand? 🤗**
+**Wakflo is not yet available in Chocolatey, would you like to give us a hand? 🤗**
 
 ```powershell
 choco install wakflo
@@ -63,7 +63,7 @@ cargo install wakflo
 
 ## Environment Variables
 
-- `WAKFLO_DIR` - The directory in which to install Wasmer. This defaults to
+- `WAKFLO_DIR` - The directory in which to install Wakflo. This defaults to
   `$HOME/.wakflo`. The executable is placed in `$WAKFLO_DIR/bin`. One
   application of this is a system-wide installation:
 
