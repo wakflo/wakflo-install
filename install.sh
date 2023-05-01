@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # This install script is intended to download and install the latest available
-# release of Wakflo AI.
+# release of Wasmer.
 # It attempts to identify the current platform and an error will be thrown if
 # the platform is not supported.
 #
@@ -9,7 +9,7 @@
 # - WAKFLO_DIR (optional): defaults to $HOME/.wakflo
 #
 # You can install using this script:
-# $ curl https://raw.githubusercontent.com/wakflo/wakflo-install/master/install.sh | sh
+# $ curl https://raw.githubusercontent.com/wakflo/wakflo-install/main/install.sh | sh
 
 # Installer script inspired by:
 #  1) https://raw.githubusercontent.com/golang/dep/master/install.sh
@@ -25,7 +25,7 @@ white="\033[37m"
 bold="\e[1m"
 dim="\e[2m"
 
-RELEASES_URL="https://github.com/wakflo/wakflo-rs/releases"
+RELEASES_URL="https://github.com/wakflo/wakflo-cli/releases"
 
 WAKFLO_VERBOSE="verbose"
 if [ -z "$WAKFLO_INSTALL_LOG" ]; then
@@ -83,7 +83,7 @@ wakflo_download_file() {
   fi
 
   if [ "$code" = 404 ]; then
-    wakflo_error "Your platform is not yet supported ($OS-$ARCH).$reset\nPlease open an issue on the project if you would like to use wakflo in your project: https://github.com/wakflo/wakflo"
+    wakflo_error "Your platform is not yet supported ($OS-$ARCH).$reset\nPlease open an issue on the project if you would like to use wakflo in your project: https://github.com/wakflo/wakflo-cli"
     return 1
   elif [ "$code" != 200 ]; then
     wakflo_error "File download failed with code $code"
@@ -138,8 +138,8 @@ wakflo_link() {
 
   WAKFLO_PROFILE="$(wakflo_detect_profile)"
 
-  LOAD_STR="\n# Wakflo AI\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\n[ -s \"\$WAKFLO_DIR/wakflo.sh\" ] && source \"\$WAKFLO_DIR/wakflo.sh\"\n"
-  SOURCE_STR="# Wakflo AI config\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\nexport WAKFLO_CACHE_DIR=\"\$WAKFLO_DIR/cache\"\nexport PATH=\"\$WAKFLO_DIR/bin:\$PATH:\$WAKFLO_DIR/globals/wapm_packages/.bin\"\n"
+  LOAD_STR="\n# Wasmer\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\n[ -s \"\$WAKFLO_DIR/wakflo.sh\" ] && source \"\$WAKFLO_DIR/wakflo.sh\"\n"
+  SOURCE_STR="# Wasmer config\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\nexport WAKFLO_CACHE_DIR=\"\$WAKFLO_DIR/cache\"\nexport PATH=\"\$WAKFLO_DIR/bin:\$PATH:\$WAKFLO_DIR/globals/wapm_packages/.bin\"\n"
 
   # We create the wakflo.sh file
   printf "$SOURCE_STR" >"$INSTALL_DIRECTORY/wakflo.sh"
@@ -162,7 +162,7 @@ wakflo_link() {
       fi
       wakflo_fresh_install=true
     else
-      wakflo_warning "the profile already has Wakflo AI and has not been changed"
+      wakflo_warning "the profile already has Wasmer and has not been changed"
     fi
 
     version=$($INSTALL_DIRECTORY/bin/wakflo --version) || (
@@ -219,9 +219,9 @@ wakflo_install() {
   magenta3=""
 
   if which wakflo >/dev/null; then
-    printf "${reset}Welcome to the Wakflo AI bash installer!$reset\n"
+    printf "${reset}Welcome to the Wasmer bash installer!$reset\n"
   else
-    printf "${reset}Welcome to the Wakflo AI bash installer!$reset\n"
+    printf "${reset}Welcome to the Wasmer bash installer!$reset\n"
     if [ "$WAKFLO_INSTALL_LOG" = "$WAKFLO_VERBOSE" ]; then
       printf "
 ${magenta1}               ww
@@ -352,7 +352,7 @@ wakflo_download() {
 
   if which $INSTALL_DIRECTORY/bin/wakflo >/dev/null; then
     WAKFLO_VERSION=$($INSTALL_DIRECTORY/bin/wakflo --version | sed 's/wakflo //g')
-    printf "Wakflo AI already installed in ${INSTALL_DIRECTORY} with version: ${WAKFLO_VERSION}\n"
+    printf "Wasmer already installed in ${INSTALL_DIRECTORY} with version: ${WAKFLO_VERSION}\n"
 
     WAKFLO_COMPARE=$(semver_compare $WAKFLO_VERSION $WAKFLO_RELEASE_TAG)
     case $WAKFLO_COMPARE in
@@ -369,7 +369,7 @@ wakflo_download() {
       # WAKFLO_VERSION > WAKFLO_RELEASE_TAG
     1)
       wakflo_warning "the selected version (${WAKFLO_RELEASE_TAG}) is lower than current installed version ($WAKFLO_VERSION)"
-      printf "Do you want to continue installing Wakflo AI $WAKFLO_RELEASE_TAG?"
+      printf "Do you want to continue installing Wasmer $WAKFLO_RELEASE_TAG?"
       wakflo_verify_or_quit || return 1
       ;;
       # WAKFLO_VERSION < WAKFLO_RELEASE_TAG (we continue)
@@ -403,71 +403,6 @@ wakflo_download() {
   # Untar the wakflo contents in the install directory
   tar -C $INSTALL_DIRECTORY -zxf $DOWNLOAD_FILE
   return 0
-}
-
-wapm_download() {
-  # identify platform based on uname output
-  initArch || return 1
-  initOS || return 1
-
-  if [ "$ARCH" = "arm64" ]; then
-    ARCH="aarch64"
-  fi
-
-  # assemble expected release artifact name
-  BINARY="wapm-cli-${OS}-${ARCH}.tar.gz"
-
-  wakflo_install_status "downloading" "wapm-cli-$OS-$ARCH"
-  # Download latest wapm version
-  wakflo_download_json LATEST_RELEASE "$WAPM_RELEASES_URL/latest" || return 1
-  WAPM_RELEASE_TAG=$(echo "${LATEST_RELEASE}" | tr -s '\n' ' ' | sed 's/.*"tag_name":"//' | sed 's/".*//' | sed 's/v//g')
-  printf "Latest release: ${WAPM_RELEASE_TAG}\n"
-
-  if which $INSTALL_DIRECTORY/bin/wapm >/dev/null; then
-    WAPM_VERSION=$($INSTALL_DIRECTORY/bin/wapm --version | sed 's/wapm-cli //g')
-    printf "WAPM already installed in ${INSTALL_DIRECTORY} with version: ${WAPM_VERSION}\n"
-
-    WAPM_COMPARE=$(semver_compare $WAPM_VERSION $WAPM_RELEASE_TAG)
-    case $WAPM_COMPARE in
-    # WAPM_VERSION = WAPM_RELEASE_TAG
-    0)
-      if [ $# -eq 0 ]; then
-        wakflo_warning "WAPM is already installed in the latest version: ${WAPM_RELEASE_TAG}"
-      else
-        wakflo_warning "WAPM is already installed with the same version: ${WAPM_RELEASE_TAG}"
-      fi
-      printf "Do you want to force the installation?"
-      wakflo_verify_or_quit || return 1
-      ;;
-      # WAPM_VERSION > WAPM_RELEASE_TAG
-    1)
-      wakflo_warning "the selected version (${WAPM_RELEASE_TAG}) is lower than current installed version ($WAPM_VERSION)"
-      printf "Do you want to continue installing WAPM $WAPM_RELEASE_TAG?"
-      wakflo_verify_or_quit || return 1
-      ;;
-      # WAPM_VERSION < WAPM_RELEASE_TAG (we continue)
-    -1) ;;
-    esac
-  fi
-
-  # fetch the real release data to make sure it exists before we attempt a download
-  wakflo_download_json RELEASE_DATA "$WAPM_RELEASES_URL/tag/v$WAPM_RELEASE_TAG" || return 1
-
-  BINARY_URL="$WAPM_RELEASES_URL/download/v$WAPM_RELEASE_TAG/$BINARY"
-  DOWNLOAD_FILE=$(mktemp -t wapm.XXXXXXXXXX)
-
-  printf "Downloading archive from ${BINARY_URL}\n"
-
-  wakflo_download_file "$BINARY_URL" "$DOWNLOAD_FILE" || return 1
-
-  printf "\033[K\n\033[1A"
-
-  wakflo_install_status "installing" "${INSTALL_DIRECTORY}"
-
-  mkdir -p $INSTALL_DIRECTORY
-
-  # Untar the WAPM contents in the install directory
-  tar -C $INSTALL_DIRECTORY -zxf $DOWNLOAD_FILE
 }
 
 wakflo_error() {

@@ -1,5 +1,6 @@
 #!/usr/bin/env pwsh
-# Copyright 2023 the Wakflo authors. All rights reserved. MIT license.
+# Copyright 2023 the Wakflo AI authors. All rights reserved. MIT license.
+# TODO(everyone): Keep this script simple and easily auditable.
 
 $ErrorActionPreference = 'Stop'
 
@@ -34,14 +35,14 @@ if ((Get-ExecutionPolicy).ToString() -notin $allowedExecutionPolicy) {
 
 $WakfloInstallerUri = if (!$Version) {
   Write-Host "Fetching latest Wakflo release..."
-  $Response = Invoke-RestMethod -Uri 'https://api.github.com/repos/wakflo/wakflo-rs/releases/latest' -UseBasicParsing
+  $Response = Invoke-RestMethod -Uri 'https://api.github.com/repos/wakflo/wakflo-cli/releases/latest' -UseBasicParsing
   ( 
     $Response.assets | 
     Where-Object { $_.name -eq "wakflo-${Target}.exe" } | 
     Select-Object -First 1 
   ).browser_download_url
 } else {
-  "https://github.com/wakflo/wakflo-rs/releases/download/${Version}/wakflo-${Target}.exe"
+  "https://github.com/wakflo/wakflo-cli/releases/download/${Version}/wakflo-${Target}.exe"
 }
 
 if (!(Test-Path $WakfloDir)) {
@@ -72,5 +73,7 @@ if (!(";$Path;".ToLower() -like "*;$WakfloBinDir;*".ToLower())) {
 }
 
 Write-Host "Wakflo installed" -ForegroundColor Green
+
+Write-Host "Finished" -ForegroundColor Green
 
 Write-Output "Run '$WakfloBinDir\wakflo --help' to get started"
