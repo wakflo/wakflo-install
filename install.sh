@@ -404,7 +404,7 @@ wakflo_download() {
   # Untar the wakflo contents in the install directory
   tar -C $INSTALL_DIRECTORY -zxf $DOWNLOAD_FILE
 
-  cp "${INSTALL_DIRECTORY}"/bin/wakflo "${INSTALL_DIRECTORY}"/bin/wakflo
+  cp "${INSTALL_DIRECTORY}"/wakflo "${INSTALL_DIRECTORY}"/bin/wakflo
   return 0
 }
 
