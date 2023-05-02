@@ -139,7 +139,7 @@ wakflo_link() {
   WAKFLO_PROFILE="$(wakflo_detect_profile)"
 
   LOAD_STR="\n# Wasmer\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\n[ -s \"\$WAKFLO_DIR/wakflo.sh\" ] && source \"\$WAKFLO_DIR/wakflo.sh\"\n"
-  SOURCE_STR="# Wasmer config\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\nexport WAKFLO_CACHE_DIR=\"\$WAKFLO_DIR/cache\"\nexport PATH=\"\$WAKFLO_DIR/bin:\$PATH:\$WAKFLO_DIR/globals/wapm_packages/.bin\"\n"
+  SOURCE_STR="# Wasmer config\nexport WAKFLO_DIR=\"$INSTALL_DIRECTORY\"\nexport WAKFLO_CACHE_DIR=\"\$WAKFLO_DIR/cache\"\nexport PATH=\"\$WAKFLO_DIR/bin:\$PATH:\$WAKFLO_DIR/globals/wakflo_packages/.bin\"\n"
 
   # We create the wakflo.sh file
   printf "$SOURCE_STR" >"$INSTALL_DIRECTORY/wakflo.sh"
@@ -246,7 +246,6 @@ ${reset}
   fi
 
   wakflo_download $1 && wakflo_link
-  wapm_download
   wakflo_reset
 }
 
@@ -299,6 +298,7 @@ semver_compare() {
   if [ $MAJOR_A -gt $MAJOR_B ]; then
     echo 1 && return 0
   fi
+
   if [ $MAJOR_A -eq $MAJOR_B ]; then
     if [ $MINOR_A -gt $MINOR_B ]; then
       echo 1 && return 0
